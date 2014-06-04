@@ -224,7 +224,7 @@ ExpTree.prototype.build = function(infixExp) {
 	if(!this.root.left && !this.root.right) {
 		return false;
 	}
-	return stack.length > 1 ? false : true;
+	return stack.length <= 1;
 };
 
 ExpTree.prototype._toInFix = function(node) {
@@ -429,3 +429,37 @@ ExpTree.prototype.dao = function(node) {
 	}
 	return t;
 };
+
+function cal(exp) {
+    console.log(exp);
+    var t = new ExpTree();
+    t.build(exp);
+    console.log('infix:', t.toInFix());
+    var dtn = t.dao(t.root);
+    var dt = new ExpTree();
+    dt.root = dtn;
+    console.log('postfix:', dt.toPostFix());
+    var x0 = 1,
+        x1 = 2,
+        i = 0;
+    while (Math.abs(x0 - x1) > 10E-9) {
+        x0 = x1;
+        x1 = x0 - (t.cal(t.root, x0) / dt.cal(dt.root, x0));
+        ++i;
+        if (i > 10E6) {
+            break;
+        }
+    }
+    if (Math.abs(x1 - Math.round(x1)) < 10E-8) {
+        x1 = Math.round(x1);
+    }
+    if (isNaN(x1)) {
+       console.log('无解或牛顿法对此不收敛。');
+    }
+    else {
+    	console.log('x = ',x1);
+    }
+    return x1;
+}
+
+cal('5x^4-9x^2+9');
